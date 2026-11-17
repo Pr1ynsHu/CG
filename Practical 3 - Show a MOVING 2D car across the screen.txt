@@ -1,0 +1,55 @@
+/********************************************************************
+ * Practical III - Show a MOVING 2D car across the screen
+ ********************************************************************/
+#include <conio.h>
+#include <graphics.h>
+
+#define screenheight getmaxy()
+#define screenwidth  getmaxx()
+
+void drawCar(int displacement){
+    // Line AB
+    line(displacement, 300, 210 + displacement, 300);
+    // Line CD
+    line(50 + displacement, 300, 75 + displacement, 270);
+    // Line DE
+    line(75 + displacement, 270, 150 + displacement, 270);
+    // Line EF
+    line(150 + displacement, 270, 165 + displacement, 300);
+    // Line AG
+    line(displacement, 300, 0 + displacement, 330);
+    // Line BH
+    line(210 + displacement, 300, 210 + displacement, 330);
+    // Circle I, 15
+    circle(65 + displacement, 330, 15);
+    // Circle I, 2
+    circle(65 + displacement, 330, 2);
+    // Circle J, 15
+    circle(145 + displacement, 330, 15);
+    // Circle J, 2
+    circle(145 + displacement, 330, 2);
+    // Line GK
+    line(0 + displacement, 330, 50 + displacement, 330);
+    // Line LM
+    line(80 + displacement, 330, 130 + displacement, 330);
+    // Line NH
+    line(210 + displacement, 330, 160 + displacement, 330);
+}
+
+void main(){
+    int gd = DETECT, gm, i = 0;
+    initgraph(&gd, &gm, "C://TURBOC3//bgi");
+
+    setbkcolor(WHITE);
+    setcolor(BLUE);
+
+    while(!kbhit()){
+        drawCar(i);
+        delay(50);
+        cleardevice();
+        i = (i + 5) % screenwidth;
+    }
+
+    getch();
+    closegraph();
+}

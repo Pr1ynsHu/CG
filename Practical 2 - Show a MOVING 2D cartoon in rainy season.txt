@@ -1,0 +1,163 @@
+/********************************************************************
+ * Practical II - Show a MOVING 2D cartoon in rainy season
+ ********************************************************************/
+#include <stdlib.h>   // Contains rand() function
+#include <conio.h>    // Contains kbhit() function
+#include <dos.h>      // Contains delay() function
+#include <graphics.h>
+
+// Get height and width of our output window
+#define screenwidth  getmaxx()
+#define screenheight getmaxy()
+
+// set the ground of our picture at 75% of height from the top of window
+#define groundY screenheight * 0.75
+
+void drawMan(int x, int legs_displacement){
+    /*
+     * This function draws a stick-human on our screen
+     * The idea is to divide the human into 4 parts:
+     *   1. Head
+     *   2. Middle Line
+     *   3. Hands
+     *   4. Legs
+     */
+
+    /*
+     * Head
+     * A circle is created with (x, groundY-90) as center with radius 10px.
+     */
+    circle(x, groundY - 90, 10);
+
+    /*
+     * Middle Line
+     * A simple line starting from the base of the head (x, groundY-80)
+     * downwards towards the legs (x, groundY-30).
+     */
+    line(x, groundY - 80, x, groundY - 30);
+
+    // Right Hand and Left Hand respectively
+    line(x, groundY - 70, x + 15, groundY - 60);
+    line(x, groundY - 70, x - 15, groundY - 60);
+
+    /* Right Leg and Left Leg Respectively
+     * To give the feeling of the legs to be moving, we are making the
+     * end-points of the legs slide by legs_displacement on each iteration.
+     */
+    line(x, groundY - 30, x + legs_displacement, groundY);
+    line(x, groundY - 30, x - legs_displacement, groundY);
+}
+
+void drawUmbrella(int x){
+    /*
+     * Umbrella
+     * It is divided into two parts:
+     *   1. Semi-circular top
+     *   2. Handle/Stick
+     */
+
+    /*
+     * Semi-circular Top
+     * We will be creating a semicircle having (x+15, groundY-120) as
+     * center and 40px as radius. Semi-circle has starting angle 0
+     * degrees and ending angle 180 degrees.
+     *
+     * pieslice(x, y, start_angle, end_angle, radius)
+     */
+    pieslice(x + 15, groundY - 120, 0, 180, 40);
+
+    /*
+     * Handle
+     * A simple line from center of semi-circular top to the hand
+     * i.e. (x+15, groundY-120) to (x+15, groundY-60)
+     */
+    line(x + 15, groundY - 120, x + 15, groundY - 60);
+}
+
+void drawRain(int x){
+    /*
+     * We will be drawing rain on our screen. The screen shall have
+     * at most 1000 rain droplets.
+     *
+     * We will be drawing a simple line of length 5 units as rain.
+     * The starting point of this list is (rx, ry) and ending point
+     * shall be (rx+0.5, ry+5). Note the 0.5 is added to the x-value.
+     * This is to give rain a slanting-look.
+     */
+
+    int i, rx, ry;
+    for(i = 0; i < 1000; i++){
+
+        /*
+         * Now, rain can be at any place on the screen. To generate
+         * this effect, we will use rand() inbuilt function. This will
+         * give us a random integer between 0 and 32000, but we want
+         * only between 0 and screenwidth or screenheight because we
+         * can only draw shapes within these two numbers. So we find
+         * mod screenwidth and screenheight and assign them as rx and
+         * ry respectively.
+         */
+        rx = rand() % screenwidth;
+        ry = rand() % screenheight;
+
+        /*
+         * We want the rain as follows:
+         * 1. It should be above ground (obvio rain can't go into the ground)
+         * 2. It should not fall on the man below the umbrella.
+         *
+         * To satisfy the first condition, we will simply check if the
+         * ending point of the rain (ry+5) is above groundY or not.
+         *
+         * To satisfy the 2nd condition, we divide our rain into two parts:
+         * 2.1. Rain from top of screen to the umbrella height.
+         * 2.2. Rain from umbrella height to the ground.
+         *
+         * In condition 2.1, we want all droplets to be there.
+         * In condition 2.2, we want all the droplets except the area
+         * around the man/under the umbrella.
+         *
+         * Drawing all the rain as-is above (groundY - 120) will satisfy 2.1
+         *
+         * Now, if rain is below groundY-120, we must NOT draw it
+         * around the man. The area under umbrella is within
+         * (x-20 and x+60), so, no rain should be there.
+         */
+        if(ry + 5 < groundY){
+            if(ry < groundY - 120 || (ry > groundY - 120 && (rx < x - 20 || rx > x + 60)))
+                line(rx, ry, rx + 0.5, ry + 5);
+        }
+    }
+}
+
+void main(){
+    // Initialize Graphics Driver
+    int gd = DETECT, gm, x = 0, legs_displacement = 0;
+    initgraph(&gd, &gm, "C://TURBOC3//bgi");
+
+    // Set BG color white and FG color Blue
+    setbkcolor(WHITE);
+    setcolor(BLUE);
+
+    // repeat drawing until a key from keyboard is hit
+    while(!kbhit()){
+        // draw the ground
+        line(0, groundY, screenwidth, groundY);
+        // draw the rain
+        drawRain(x);
+        // draw the man with moving legs
+        legs_displacement = (legs_displacement + 2) % 20;
+        drawMan(x, legs_displacement);
+        // draw umbrella
+        drawUmbrella(x);
+
+        // wait for 75ms before clearing the screen
+        delay(75);
+        // remove all drawings from the screen
+        cleardevice();
+
+        // Move man, umbrella by 2px ahead
+        x = (x + 2) % screenwidth;
+    }
+
+    closegraph();
+}
