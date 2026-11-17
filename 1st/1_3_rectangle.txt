@@ -1,0 +1,23 @@
+/* Practical I.3 - Drawing a rectangle using output primitives
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+
+    if (graphresult() != grOk)
+        return 1;
+
+    setbkcolor(WHITE);
+    cleardevice();
+    setcolor(RED);
+    rectangle(25, 25, 150, 225);
+
+    getch();
+    closegraph();
+    return 0;
+}
