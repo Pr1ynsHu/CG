@@ -1,0 +1,57 @@
+/* Practical III - Moving 2D car across the screen
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+#include <dos.h>
+
+void drawCar(int x, int groundY)
+{
+    /* Body and roof */
+    line(x, groundY - 30, x + 210, groundY - 30);
+    line(x + 50, groundY - 30, x + 75, groundY - 60);
+    line(x + 75, groundY - 60, x + 150, groundY - 60);
+    line(x + 150, groundY - 60, x + 165, groundY - 30);
+    line(x, groundY - 30, x, groundY);
+    line(x + 210, groundY - 30, x + 210, groundY);
+
+    /* Wheels */
+    circle(x + 65, groundY, 15);
+    circle(x + 145, groundY, 15);
+    circle(x + 65, groundY, 2);
+    circle(x + 145, groundY, 2);
+
+    line(x, groundY, x + 50, groundY);
+    line(x + 80, groundY, x + 130, groundY);
+    line(x + 160, groundY, x + 210, groundY);
+}
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    int x = 0, maxX, maxY, groundY;
+
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+    if (graphresult() != grOk)
+        return 1;
+
+    maxX = getmaxx();
+    maxY = getmaxy();
+    groundY = maxY - 60;
+
+    setbkcolor(WHITE);
+    setcolor(BLUE);
+
+    while (!kbhit()) {
+        cleardevice();
+        drawCar(x, groundY);
+        delay(50);
+        x += 5;
+        if (x > maxX)
+            x = -210;
+    }
+
+    getch();
+    closegraph();
+    return 0;
+}

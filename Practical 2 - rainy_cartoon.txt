@@ -1,0 +1,76 @@
+/* Practical II - Moving 2D cartoon in rainy season
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+#include <dos.h>
+#include <stdlib.h>
+
+void drawMan(int x, int groundY, int legOffset)
+{
+    circle(x, groundY - 90, 10);
+    line(x, groundY - 80, x, groundY - 30);
+    line(x, groundY - 70, x + 15, groundY - 60);
+    line(x, groundY - 70, x - 15, groundY - 60);
+    line(x, groundY - 30, x + legOffset, groundY);
+    line(x, groundY - 30, x - legOffset, groundY);
+}
+
+void drawUmbrella(int x, int groundY)
+{
+    pieslice(x + 15, groundY - 120, 0, 180, 40);
+    line(x + 15, groundY - 120, x + 15, groundY - 60);
+}
+
+void drawRain(int x, int groundY, int maxX, int maxY)
+{
+    int i, rx, ry;
+    for (i = 0; i < 250; ++i) {
+        rx = random(maxX + 1);
+        ry = random(maxY + 1);
+
+        if (ry + 5 < groundY) {
+            if (ry < groundY - 120 ||
+                (ry > groundY - 120 && (rx < x - 20 || rx > x + 60))) {
+                line(rx, ry, rx + 1, ry + 5);
+            }
+        }
+    }
+}
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    int x = 50, legOffset = 0;
+    int maxX, maxY, groundY;
+
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+    if (graphresult() != grOk)
+        return 1;
+
+    maxX = getmaxx();
+    maxY = getmaxy();
+    groundY = (maxY * 3) / 4;
+    randomize();
+
+    setbkcolor(WHITE);
+    setcolor(BLUE);
+
+    while (!kbhit()) {
+        cleardevice();
+        line(0, groundY, maxX, groundY);
+        drawRain(x, groundY, maxX, groundY - 1);
+        drawMan(x, groundY, legOffset);
+        drawUmbrella(x, groundY);
+
+        delay(75);
+        legOffset = (legOffset + 2) % 20;
+        x += 2;
+        if (x > maxX - 60)
+            x = 60;
+    }
+
+    getch();
+    closegraph();
+    return 0;
+}

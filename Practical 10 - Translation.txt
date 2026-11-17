@@ -1,0 +1,41 @@
+/* Practical X - Translating a line
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+
+void drawLine(int points[2][2], int color)
+{
+    setcolor(color);
+    line(points[0][0], points[0][1],
+         points[1][0], points[1][1]);
+}
+
+void translateLine(int points[2][2], int tx, int ty)
+{
+    points[0][0] += tx;
+    points[0][1] += ty;
+    points[1][0] += tx;
+    points[1][1] += ty;
+}
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    int points[2][2] = { {100, 100}, {200, 200} };
+
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+    if (graphresult() != grOk)
+        return 1;
+
+    setbkcolor(WHITE);
+    cleardevice();
+
+    drawLine(points, BLUE);
+    translateLine(points, 100, 10);
+    drawLine(points, RED);
+
+    getch();
+    closegraph();
+    return 0;
+}

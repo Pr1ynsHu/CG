@@ -1,0 +1,59 @@
+/* Practical V - Bresenham line generation algorithm
+   Integer algorithm supporting all eight octants.
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+#include <iostream.h>
+#include <stdlib.h>
+
+void bresenham(int x1, int y1, int x2, int y2)
+{
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
+    int sx = (x1 < x2) ? 1 : -1;
+    int sy = (y1 < y2) ? 1 : -1;
+    int error = dx - dy;
+    int twiceError;
+
+    for (;;) {
+        putpixel(x1, y1, RED);
+
+        if (x1 == x2 && y1 == y2)
+            break;
+
+        twiceError = 2 * error;
+
+        if (twiceError > -dy) {
+            error -= dy;
+            x1 += sx;
+        }
+        if (twiceError < dx) {
+            error += dx;
+            y1 += sy;
+        }
+    }
+}
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    int xi, yi, xf, yf;
+
+    cout << "Enter starting point (xi yi): ";
+    cin >> xi >> yi;
+    cout << "Enter ending point (xf yf): ";
+    cin >> xf >> yf;
+
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+    if (graphresult() != grOk)
+        return 1;
+
+    setbkcolor(WHITE);
+    cleardevice();
+    bresenham(xi, yi, xf, yf);
+
+    getch();
+    closegraph();
+    return 0;
+}

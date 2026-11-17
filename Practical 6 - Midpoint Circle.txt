@@ -1,0 +1,64 @@
+/* Practical VI - Midpoint circle generation algorithm
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+#include <iostream.h>
+
+void plotEightWay(int x, int y, int xc, int yc)
+{
+    putpixel(xc + x, yc + y, RED);
+    putpixel(xc - x, yc + y, RED);
+    putpixel(xc + x, yc - y, RED);
+    putpixel(xc - x, yc - y, RED);
+    putpixel(xc + y, yc + x, RED);
+    putpixel(xc - y, yc + x, RED);
+    putpixel(xc + y, yc - x, RED);
+    putpixel(xc - y, yc - x, RED);
+}
+
+void drawCircle(int xc, int yc, int radius)
+{
+    int x = 0;
+    int y = radius;
+    int decision = 1 - radius;
+
+    if (radius < 0)
+        return;
+
+    plotEightWay(x, y, xc, yc);
+
+    while (x < y) {
+        if (decision < 0) {
+            decision += 2 * x + 3;
+        } else {
+            decision += 2 * (x - y) + 5;
+            --y;
+        }
+        ++x;
+        plotEightWay(x, y, xc, yc);
+    }
+}
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    int x, y, radius;
+
+    cout << "Enter circle radius: ";
+    cin >> radius;
+    cout << "Enter center coordinates (x y): ";
+    cin >> x >> y;
+
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+    if (graphresult() != grOk)
+        return 1;
+
+    setbkcolor(WHITE);
+    cleardevice();
+    drawCircle(x, y, radius);
+
+    getch();
+    closegraph();
+    return 0;
+}

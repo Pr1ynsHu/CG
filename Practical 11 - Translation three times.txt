@@ -1,0 +1,46 @@
+/* Practical XI - Translating a line consecutively three times
+   Each translation is applied to the result of the previous one.
+   Borland Turbo C++ / BGI
+*/
+#include <graphics.h>
+#include <conio.h>
+
+void drawLine(int points[2][2], int color)
+{
+    setcolor(color);
+    line(points[0][0], points[0][1],
+         points[1][0], points[1][1]);
+}
+
+void translateLine(int points[2][2], int tx, int ty)
+{
+    points[0][0] += tx;
+    points[0][1] += ty;
+    points[1][0] += tx;
+    points[1][1] += ty;
+}
+
+int main(void)
+{
+    int gd = DETECT, gm;
+    int points[2][2] = { {100, 100}, {200, 200} };
+
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
+    if (graphresult() != grOk)
+        return 1;
+
+    setbkcolor(WHITE);
+    cleardevice();
+
+    drawLine(points, BLUE);
+    translateLine(points, 25, 0);
+    drawLine(points, RED);
+    translateLine(points, 75, 0);
+    drawLine(points, CYAN);
+    translateLine(points, 150, 0);
+    drawLine(points, GREEN);
+
+    getch();
+    closegraph();
+    return 0;
+}
