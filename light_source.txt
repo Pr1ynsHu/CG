@@ -1,0 +1,101 @@
+/*
+   Light source in a dark room - scattered yellow dots  (Turbo C++ 3.0)
+
+   - Tall room, one light source at the middle of the top wall.
+   - Two rays go down-left and down-right to the side walls.
+   - Yellow dots are scattered randomly inside the cone, starting
+     at the source and spreading out (no gradient, plain dots).
+
+   Change the BGI path in initgraph() if Turbo C++ is not in C:\TC.
+   Press any key to exit.
+*/
+
+#include <graphics.h>
+#include <conio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+/* room */
+#define RX1 170
+#define RY1 30
+#define RX2 470
+#define RY2 450
+
+/* light source: centre of the top wall */
+float SX = 320, SY = 30;
+
+float HALF_ANGLE = 26.0;   /* half-width of the cone, in degrees */
+int   DOTS       = 1500;   /* how many dots to scatter */
+
+int main()
+{
+    int gd = VGA, gm = VGAHI;
+    int x, y, n;
+    float PI = 3.14159265;
+    float a, t, ang, r;
+    float xl, yl, xr, yr;
+
+    a = HALF_ANGLE * PI / 180.0;
+    t = tan(a);
+
+    initgraph(&gd, &gm, "C:\\TC\\BGI");
+    if (graphresult() != grOk) {
+        printf("Graphics error. Check the BGI path in initgraph().\n");
+        getch();
+        return 1;
+    }
+
+    cleardevice();
+    randomize();
+
+    /* room walls */
+    setcolor(WHITE);
+    rectangle(RX1, RY1, RX2, RY2);
+
+    /* where the two rays meet the side walls */
+    xl = RX1;
+    yl = SY + (SX - RX1) / t;
+    if (yl > RY2) { yl = RY2; xl = SX - (RY2 - SY) * t; }
+
+    xr = RX2;
+    yr = SY + (RX2 - SX) / t;
+    if (yr > RY2) { yr = RY2; xr = SX + (RY2 - SY) * t; }
+
+    /* the two rays */
+    setcolor(YELLOW);
+    line((int)SX, (int)SY, (int)xl, (int)yl);
+    line((int)SX, (int)SY, (int)xr, (int)yr);
+
+    /* scatter yellow dots inside the cone */
+    n = 0;
+    while (n < DOTS) {
+        /* random direction inside the cone (0 = straight down) */
+        ang = ((random(2001) - 1000) / 1000.0) * a;
+        /* random distance from the source */
+        r = random(450) + 1;
+
+        x = (int)(SX + r * sin(ang));
+        y = (int)(SY + r * cos(ang));
+
+        /* keep the dot inside the room */
+        if (x <= RX1 || x >= RX2 || y <= RY1 || y >= RY2)
+            continue;
+
+        putpixel(x, y, YELLOW);
+        n++;
+
+        if (kbhit()) { getch(); closegraph(); return 0; }
+    }
+
+    /* the light source */
+    setcolor(WHITE);
+    setfillstyle(SOLID_FILL, WHITE);
+    fillellipse((int)SX, (int)SY, 5, 5);
+
+    outtextxy(10, 10, "Light source in a dark room - press any key");
+
+    getch();
+    closegraph();
+    return 0;
+}
