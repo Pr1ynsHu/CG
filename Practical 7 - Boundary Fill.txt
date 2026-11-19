@@ -1,46 +1,28 @@
-/* Practical VII - Boundary fill algorithm (4-connected)
-   The recursive implementation is suitable for the small region in
-   this demonstration. Keep the seed point inside the closed boundary.
-   Borland Turbo C++ / BGI
-*/
 #include <graphics.h>
 #include <conio.h>
 
-void boundaryFill(int x, int y, int fillColor, int boundaryColor)
-{
-    int currentColor;
+void boundaryFill(int x, int y, int fillColor, int boundaryColor) {
+    int c = getpixel(x, y);
 
-    if (x < 0 || x > getmaxx() || y < 0 || y > getmaxy())
-        return;
-
-    currentColor = getpixel(x, y);
-    if (currentColor == boundaryColor || currentColor == fillColor)
-        return;
-
-    putpixel(x, y, fillColor);
-
-    boundaryFill(x + 1, y, fillColor, boundaryColor);
-    boundaryFill(x, y - 1, fillColor, boundaryColor);
-    boundaryFill(x - 1, y, fillColor, boundaryColor);
-    boundaryFill(x, y + 1, fillColor, boundaryColor);
+    if (c != fillColor && c != boundaryColor) {
+        putpixel(x, y, fillColor);
+        boundaryFill(x + 1, y, fillColor, boundaryColor);
+        boundaryFill(x, y - 1, fillColor, boundaryColor);
+        boundaryFill(x - 1, y, fillColor, boundaryColor);
+        boundaryFill(x, y + 1, fillColor, boundaryColor);
+    }
 }
 
-int main(void)
-{
+void main() {
     int gd = DETECT, gm;
-
-    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
-    if (graphresult() != grOk)
-        return 1;
+    initgraph(&gd, &gm, "C://TURBOC3//bgi");
 
     setbkcolor(WHITE);
-    cleardevice();
     setcolor(BLUE);
-    rectangle(100, 100, 158, 157);
 
+    rectangle(100, 100, 158, 157);
     boundaryFill(101, 101, CYAN, BLUE);
 
     getch();
     closegraph();
-    return 0;
 }
