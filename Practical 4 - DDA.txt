@@ -1,67 +1,42 @@
-/* Practical IV - DDA line generation algorithm
-   Handles all line directions, including vertical and point lines.
-   Borland Turbo C++ / BGI
-*/
 #include <graphics.h>
 #include <conio.h>
 #include <iostream.h>
-#include <stdlib.h>
 
-int nearestPixel(float value)
-{
-    if (value >= 0.0)
-        return (int)(value + 0.5);
-    return (int)(value - 0.5);
-}
+void dda(int xi, int yi, int xf, int yf) {
+    int dx = xf - xi;
+    int dy = yf - yi;
+    float m = (float)dy / dx;
+    float x = xi, y = yi;
 
-void dda(int x1, int y1, int x2, int y2)
-{
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-    int steps, i;
-    float x, y, xIncrement, yIncrement;
+    putpixel(x, y, RED);
 
-    steps = abs(dx);
-    if (abs(dy) > steps)
-        steps = abs(dy);
-
-    x = (float)x1;
-    y = (float)y1;
-
-    if (steps == 0) {
-        putpixel(x1, y1, RED);
-        return;
-    }
-
-    xIncrement = (float)dx / steps;
-    yIncrement = (float)dy / steps;
-
-    for (i = 0; i <= steps; ++i) {
-        putpixel(nearestPixel(x), nearestPixel(y), RED);
-        x += xIncrement;
-        y += yIncrement;
+    if (m <= 1) {
+        while (x < xf) {
+            x++;
+            y = y + m;
+            putpixel(x, y, RED);
+        }
+    } else {
+        while (y <= yf) {
+            x = x + (1 / m);
+            y++;
+            putpixel(x, y, RED);
+        }
     }
 }
 
-int main(void)
-{
-    int gd = DETECT, gm;
-    int xi, yi, xf, yf;
+void main() {
+    int gd = DETECT, gm, xi, xf, yi, yf;
+    initgraph(&gd, &gm, "C://TURBOC3//bgi");
 
-    cout << "Enter starting point (xi yi): ";
+    cout << "Enter value of xi, yi: ";
     cin >> xi >> yi;
-    cout << "Enter ending point (xf yf): ";
+    cout << "\nEnter value of xf, yf: ";
     cin >> xf >> yf;
 
-    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
-    if (graphresult() != grOk)
-        return 1;
-
     setbkcolor(WHITE);
-    cleardevice();
     dda(xi, yi, xf, yf);
 
     getch();
     closegraph();
-    return 0;
 }
