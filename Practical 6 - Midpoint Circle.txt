@@ -1,64 +1,59 @@
-/* Practical VI - Midpoint circle generation algorithm
-   Borland Turbo C++ / BGI
-*/
 #include <graphics.h>
 #include <conio.h>
 #include <iostream.h>
 
-void plotEightWay(int x, int y, int xc, int yc)
-{
-    putpixel(xc + x, yc + y, RED);
-    putpixel(xc - x, yc + y, RED);
-    putpixel(xc + x, yc - y, RED);
-    putpixel(xc - x, yc - y, RED);
-    putpixel(xc + y, yc + x, RED);
-    putpixel(xc - y, yc + x, RED);
-    putpixel(xc + y, yc - x, RED);
-    putpixel(xc - y, yc - x, RED);
+void plotPixel(int x, int y, int Xcenter, int Ycenter) {
+    /*
+     * 8-way circle symmetry:
+     * ( x,  y) <--> ( y,  x)
+     * ( x, -y) <--> (-y,  x)
+     * (-x,  y) <--> ( y, -x)
+     * (-x, -y) <--> (-y, -x)
+     * Translate every point by the center coordinates.
+     */
+    putpixel( x + Xcenter,  y + Ycenter, RED);
+    putpixel( y + Xcenter,  x + Ycenter, RED);
+
+    putpixel( x + Xcenter, -y + Ycenter, RED);
+    putpixel(-y + Xcenter,  x + Ycenter, RED);
+
+    putpixel(-x + Xcenter,  y + Ycenter, RED);
+    putpixel( y + Xcenter, -x + Ycenter, RED);
+
+    putpixel(-x + Xcenter, -y + Ycenter, RED);
+    putpixel(-y + Xcenter, -x + Ycenter, RED);
 }
 
-void drawCircle(int xc, int yc, int radius)
-{
-    int x = 0;
-    int y = radius;
-    int decision = 1 - radius;
+void drawcircle(int Xcenter, int Ycenter, int radius) {
+    int x = 0, y = radius, P = 1 - radius;
+    plotPixel(x, y, Xcenter, Ycenter);
 
-    if (radius < 0)
-        return;
-
-    plotEightWay(x, y, xc, yc);
-
-    while (x < y) {
-        if (decision < 0) {
-            decision += 2 * x + 3;
+    while (x <= y) {
+        if (P < 0) {
+            x++;
+            plotPixel(x, y, Xcenter, Ycenter);
+            P = P + 2 * x + 1;
         } else {
-            decision += 2 * (x - y) + 5;
-            --y;
+            x++;
+            y--;
+            plotPixel(x, y, Xcenter, Ycenter);
+            P = P + 2 * x + 1 - 2 * y;
         }
-        ++x;
-        plotEightWay(x, y, xc, yc);
     }
 }
 
-int main(void)
-{
-    int gd = DETECT, gm;
-    int x, y, radius;
+void main() {
+    int gdriver = DETECT, gmode, x, y, r;
+    initgraph(&gdriver, &gmode, "C://TURBOC3//bgi");
 
-    cout << "Enter circle radius: ";
-    cin >> radius;
-    cout << "Enter center coordinates (x y): ";
+    cout << "Enter radius of circle: ";
+    cin >> r;
+    cout << "Enter co-ordinates of center (x and y): ";
     cin >> x >> y;
 
-    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
-    if (graphresult() != grOk)
-        return 1;
-
     setbkcolor(WHITE);
-    cleardevice();
-    drawCircle(x, y, radius);
+    drawcircle(x, y, r);
 
     getch();
     closegraph();
-    return 0;
 }
