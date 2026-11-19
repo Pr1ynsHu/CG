@@ -1,59 +1,56 @@
-/* Practical V - Bresenham line generation algorithm
-   Integer algorithm supporting all eight octants.
-   Borland Turbo C++ / BGI
-*/
 #include <graphics.h>
 #include <conio.h>
 #include <iostream.h>
-#include <stdlib.h>
 
-void bresenham(int x1, int y1, int x2, int y2)
-{
-    int dx = abs(x2 - x1);
-    int dy = abs(y2 - y1);
-    int sx = (x1 < x2) ? 1 : -1;
-    int sy = (y1 < y2) ? 1 : -1;
-    int error = dx - dy;
-    int twiceError;
+void bresenham(int xi, int yi, int xf, int yf) {
+    int dx = xf - xi;
+    int dy = yf - yi;
+    float m = (float)dy / dx;
+    int x = xi, y = yi;
 
-    for (;;) {
-        putpixel(x1, y1, RED);
+    putpixel(x, y, RED);
 
-        if (x1 == x2 && y1 == y2)
-            break;
-
-        twiceError = 2 * error;
-
-        if (twiceError > -dy) {
-            error -= dy;
-            x1 += sx;
+    if (m < 1) {
+        int P = 2 * dy - dx;
+        while (x <= xf) {
+            if (P < 0) {
+                x++;
+                P = P + 2 * dy;
+            } else {
+                x++;
+                y++;
+                P = P + 2 * (dy - dx);
+            }
+            putpixel(x, y, RED);
         }
-        if (twiceError < dx) {
-            error += dx;
-            y1 += sy;
+    } else {
+        int P = 2 * dx - dy;
+        while (y <= yf) {
+            if (P < 0) {
+                y++;
+                P = P + 2 * dx;
+            } else {
+                y++;
+                x++;
+                P = P + 2 * (dx - dy);
+            }
+            putpixel(x, y, RED);
         }
     }
 }
 
-int main(void)
-{
-    int gd = DETECT, gm;
-    int xi, yi, xf, yf;
+void main() {
+    int gd = DETECT, gm, xi, xf, yi, yf;
+    initgraph(&gd, &gm, "C://TURBOC3//bgi");
 
-    cout << "Enter starting point (xi yi): ";
+    cout << "Enter value of xi, yi: ";
     cin >> xi >> yi;
-    cout << "Enter ending point (xf yf): ";
+    cout << "\nEnter value of xf, yf: ";
     cin >> xf >> yf;
 
-    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
-    if (graphresult() != grOk)
-        return 1;
-
     setbkcolor(WHITE);
-    cleardevice();
     bresenham(xi, yi, xf, yf);
 
     getch();
     closegraph();
-    return 0;
 }
